@@ -1,0 +1,49 @@
+<project name="Garmin2KML" default="all" basedir=".">
+
+	<property name="build" value="${basedir}/build"/>
+	<property name="source" value="${basedir}/source"/>
+	<property name="files" value="${source}/files"/>
+	<property name="java" value="${source}/java"/>
+	<property name="products" value="${basedir}/products"/>
+
+	<target name="clean">
+		<delete dir="${build}" failonerror="false"/>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${build}"/>
+		<tstamp>
+			<format property="today" pattern="yyyy.MM.dd"/>
+			<format property="now" pattern="HH:mm:ss z"/>
+		</tstamp>
+		<echo message="Time now ${now}"/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${products}"/>
+	</target>
+
+	<target name="jar" depends="init">
+		<javac destdir="${build}" optimize="on"
+			includeantruntime="false"
+			debug="true" debuglevel="lines,vars,source">
+			<src path="${java}"/>
+			<compilerarg value="-Xlint:unchecked"/>
+			<compilerarg value="-Xlint:deprecation"/>
+		</javac>
+		<copy overwrite="true" todir="${build}">
+			<fileset dir="${files}"/>
+		</copy>
+		<jar jarfile="${products}/Garmin2KML.jar">
+			<manifest>
+				<attribute name="Main-Class" value="org.jp.kml.Garmin2KML"/>
+				<attribute name="Implementation-Version" value="${today} @ ${now}"/>
+	            <attribute name="Date" value="${today} at ${now}"/>
+	            <attribute name="Java-Version" value="${ant.java.version}"/>
+	            <attribute name="Description" value="Convert Garmin path file to KML"/>
+			</manifest>
+			<fileset dir="${build}" includes="**"/>
+		</jar>
+	</target>
+
+	<target name="all" depends="clean, jar"/>
+
+</project>
